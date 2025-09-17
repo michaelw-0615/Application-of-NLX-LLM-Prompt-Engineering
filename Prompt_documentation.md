@@ -243,7 +243,7 @@ INPUT HEADLINES: One per line, attached as .docx file.
 **Potential failure modes & mitigations.**
 
 - Evidence not an exact substring. Mitigate with “verbatim-substring only” gate and a one-line example.
-- Ticker over-resolution (guessing). Mitigate by “if ambiguous, return null” and prefer primary subject.
+- Ticker over-resolution (guessing). Mitigate by prompt “if ambiguous, return null” and prefer primary subject.
 - Label confusion (e.g., regulatory vs crypto_etf; product_tech vs investment_capex). Mitigate with rule bullets and high-signal cue words (“approve/ban/filing” vs “build/invest/plant”).
 - Format errors. Mitigate with JSON-array schema and “no prose” rule.
 
@@ -304,7 +304,7 @@ INPUT: Attached as .docx file.
 **Potential failure modes & mitigations.**
 
 - Over-generalization from narrow examples. Mitigate by adding one neutral and one negative exemplar later (pilot feedback).
-- Ticker leakage to non-equities (e.g., BTC). Mitigate with explicit “non-equity → null.”
+- Ticker leakage to non-equities (e.g., BTC). Mitigate with explicit instruction “non-equity → null.”
 - Event boundary errors (valuation vs macro_market). Mitigate with a cue list inside the prompt and post-run error sampling to tune wording.
 
 ### B-3: Chain-of-Thought Prompt
@@ -351,12 +351,12 @@ NOTES:
 **Design rationale.** The task requires micro-decisions (identify subject → map to label → assign sentiment → extract minimal evidence → resolve ticker). A private checklist reduces flip-flops without polluting outputs, improving schema validity and evidence precision.
 
 **Expected output characteristics.**
-- JSON-in/JSON-out: convenient for pipelines; position-aligned results.
+- JSON output: convenient for pipelines; position-aligned results.
 - Consistent, short evidence strings and conservative ticker resolution.
 - Deterministic behavior when run at low temperature.
 
 **Potential failure modes & mitigations.**
-- Verbose outputs or rationale leakage. Mitigate via “JSON only; no commentary.”
-- Evidence too long or paraphrased. Mitigate with “minimal but sufficient; exact substring.”
+- Verbose outputs or rationale leakage. Mitigate with prompt “JSON only; no commentary.”
+- Evidence too long or paraphrased. Mitigate with prompt “minimal but sufficient; exact substring.”
 - Sentiment drift. Mitigate by anchoring sentiment to market-relevant framing and enumerating typical positive/negative cues.
 

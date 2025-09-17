@@ -16,7 +16,7 @@ RULES:
 - Every numeric claim in the brief must be backed by a citation present in the JSON `citations` array.
 - For each input block, output the brief first, then the JSON. Keep the same order as inputs.
 BATCH INPUT: Attached to chatbox in the format of PDF
-JSON SCHEMA (for each company)
+JSON SCHEMA (for each company):
 
 ```json
 {
@@ -147,7 +147,7 @@ You will silently plan the steps (locate numbers → normalize units → verify 
 
 INPUT: Attached as batch PDF files.
 
-CONSTRAINTS
+CONSTRAINTS:
 - Normalize: YoY in pp (1 decimal), operating-margin delta in bps (integer), currency in USD millions if mentioned.
 - If evidence is missing for any field, set it to null and state “unavailable in provided 10-K excerpt” in the brief.
 - Every numeric claim must have a corresponding citation anchor in `data.citations`.
@@ -198,7 +198,7 @@ OUTPUT (JSON only; no extra prose):
 
 You are a finance news tagging assistant for downstream analytics. Return a VALID JSON array only (no prose). Use the label set and rules exactly.
 
-TASK
+TASK:
 
 For each input headline, produce an object with:
 - event_type ∈ {earnings, M&A_deal, regulatory_policy, investment_capex, product_tech, labor_layoffs, IPO_listing, valuation_milestone, crypto_etf, macro_market, other}
@@ -206,7 +206,7 @@ For each input headline, produce an object with:
 - ticker: primary listed symbol if unambiguous (e.g., NVDA, AAPL); else null
 - evidence: exact substring from the headline that justifies event_type (minimal span)
 
-DISAMBIGUATION RULES
+DISAMBIGUATION RULES:
 - If multiple entities appear, pick the primary subject of the action.
 - “most valuable”, “$3 trillion market cap”, “record high” → valuation_milestone.
 - Government/SEC/antitrust/approval/ban/filing → regulatory_policy (crypto ETFs use crypto_etf).
@@ -215,7 +215,7 @@ DISAMBIGUATION RULES
 - “cuts/layoffs/hiring freeze” → labor_layoffs.
 - If ticker can’t be confidently resolved or isn’t an equity (e.g., Bitcoin), use null.
 
-OUTPUT FORMAT
+OUTPUT FORMAT:
 
 Strictly return a JSON array with one object per headline, same order as input. Example shape:
 
@@ -230,4 +230,19 @@ Strictly return a JSON array with one object per headline, same order as input. 
 ]
 ```
 
-INPUT HEADLINES (one per line, attached as .docx file)
+INPUT HEADLINES: One per line, attached as .docx file.
+
+
+**Design rationale.** A crisp taxonomy and minimal-span evidence extraction are made explicit. CLEAR specifies disambiguation rules (e.g. primary subject, non-equity entities, crypto ETF carve-out) and the JSON-only constraint, aligning with scoring in the next phase.
+
+**Expected output characteristics.**
+
+- Per headline, a JSON object with: event_type from a fixed set; sentiment (pos/neu/neg); ticker or null; and verbatim evidence substring.
+- Batch outputs preserve input order for easy alignment with gold labels.
+
+**Potential failure modes & mitigations.**
+
+- Evidence not an exact substring. Mitigate with “verbatim-substring only” gate and a one-line example.
+- Ticker over-resolution (guessing). Mitigate by “if ambiguous, return null” and prefer primary subject.
+- Label confusion (e.g., regulatory vs crypto_etf; product_tech vs investment_capex). Mitigate with rule bullets and high-signal cue words (“approve/ban/filing” vs “build/invest/plant”).
+- Format errors. Mitigate with JSON-array schema and “no prose” rule.

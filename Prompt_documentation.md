@@ -46,8 +46,9 @@ JSON SCHEMA (for each company)
 - Accounting ambiguity (GAAP vs CC/Non-GAAP). Mitigate by defaulting to GAAP unless the text explicitly states otherwise; instruct to disclose basis in the brief.
 - Excess length. Mitigate with explicit ≤250-word cap and section headers.
 
-### Few-shot Prompt
+### Few-Shot Prompt
 **Prompt content.**
+
 [Example 1 Input]
 
 Company: American Express Company (AMEX) | Period: FY2015 | Doc ID: AMEX-10K-2015
@@ -138,4 +139,63 @@ STRICT OUTPUT: For each block, print the brief (≤250 words) followed by exactl
 - Ticker leakage to non-equities (e.g., BTC). Mitigate with explicit “non-equity → null.”
 - Event boundary errors (valuation vs macro_market). Mitigate with a cue list inside the prompt and post-run error sampling to tune wording.
 
+### Chain-of-Thought Prompt
+
+**Prompt content.** 
+
+You will silently plan the steps (locate numbers → normalize units → verify evidence → compose brief → validate JSON), but DO NOT reveal your chain-of-thought. Use only the provided text.
+
+INPUT (JSON array of documents):
+
+```json
+{
+  "docs": [
+    {
+      "company": "{COMPANY_1}",
+      "period": "{FISCAL_YEAR_1}",
+      "doc_id": "{DOC_ID_1}",
+      "doc_text": "{DOC_TEXT_1}",
+      "table_text": "{TABLE_TEXT_1}"
+    },
+    {
+      "company": "{COMPANY_2}",
+      "period": "{FISCAL_YEAR_2}",
+      "doc_id": "{DOC_ID_2}",
+      "doc_text": "{DOC_TEXT_2}",
+      "table_text": "{TABLE_TEXT_2}"
+    }
+    // ... repeat for all companies
+  ]
+}
+```
+
+CONSTRAINTS
+- Normalize: YoY in pp (1 decimal), operating-margin delta in bps (integer), currency in USD millions if mentioned.
+- If evidence is missing for any field, set it to null and state “unavailable in provided 10-K excerpt” in the brief.
+- Every numeric claim must have a corresponding citation anchor in `data.citations`.
+
+INPUT: Attached as PDF files.
+
+OUTPUT (JSON only; no extra prose):
+
+```json
+{
+  "results": [
+    {
+      "company": "{COMPANY_1}",
+      "period": "{FISCAL_YEAR_1}",
+      "narrative": "≤250-word brief here ... (doc:{DOC_ID_1} p.X ¶Y) ...",
+      "data": {
+        "revenue_yoy_pct": 0.0,
+        "op_margin_bps_delta": 0,
+        "guidance_change": "raise|maintain|lower|n/a",
+        "top_drivers": ["...", "..."],
+        "top_risks": ["...", "..."],
+        "citations": ["doc:{DOC_ID_1} p.X ¶Y", "doc:{DOC_ID_1} p.Z table:RowLabel"]
+      }
+    }
+    // ... one object per input, same order
+  ]
+}
+```
 

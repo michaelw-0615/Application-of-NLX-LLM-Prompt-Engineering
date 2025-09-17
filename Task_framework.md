@@ -25,10 +25,26 @@ In this project, we are evaluating LLMs in the field of fundamental analysis on 
   The output will be evaluated on the following criteria:
 
   **Schema Validity Rate:** The proportion of parsable .json files, categorized into 4-point scales (>98%--4; 95-98%--3; 90-95%--2; <90%--1)
-
   **Fact Accuracy:** The proportion of exact-matches for revenue_yoy_pct and op_margin_bps_delta indices categorized into 4-point scales (>95%--4; 90-95%--3; 75-90%--2; <75%--1)
-
   **Citation Coverage:** Percentage of numerical claims with at least one correct citation span, categorized into 4-point scales (>95%--4; 90-95%--3; 80-90%--2; <80%--1)
-
   **Coverage and Overall Readability:** Percentage of briefings including all four narrative sections, categorized into 4-point scales (>95%--4; 90-95%--3; 80-90%--2; <80%--1)
+
+  ### Task B: Classification Analysis on Financial Headlines
+  For this task, LLMs are given tag headlines with event type, sentiment, and focal ticker, and are expected to return a short evidence snippet. The output should be a .json object structured as:
+
+  ```json
+  {
+      "event_type": "earnings|M&A|guidance|regulatory|macro|other",
+      "sentiment": "pos|neu|neg",
+      "ticker": "AAPL",
+      "evidence": "trigger phrase or cue"
+  }
+  ```
+    
+  The output will be evaluated on the following criteria:
+
+  **Event-Type Macro-F1:** The F1-score for all event-type tags, categorized into 4-point scales (>95%--4; 90-95%--3; 75-90%--2; <75%--1)
+  **Sentiment Macro-F1:** The F1-score for all sentiment tags, categorized into 4-point scales (>95%--4; 90-95%--3; 75-90%--2; <75%--1)
+  **Evidence Precision:** The precision score for all evidence pieces returned, categorized into 4-point scales (>95%--4; 90-95%--3; 75-90%--2; <75%--1)
+
 

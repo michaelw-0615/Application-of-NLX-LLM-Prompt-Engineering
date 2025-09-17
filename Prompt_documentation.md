@@ -5,6 +5,7 @@ Below are design notes for six prompts (three per task). For each, we summarize:
 ## Task A: Information Synthesis
 ### CLEAR Prompt
 **Prompt content**. 
+
 You’re an equity research analyst. You will process a batch of 10-K excerpts for your customer and return, for EACH document, exactly:
 1) a ≤250-word analyst brief with four sections (Results Snapshot → Key Drivers → Outlook & Risks → Follow-ups), and
 2) one JSON object matching the schema at the end of this message.

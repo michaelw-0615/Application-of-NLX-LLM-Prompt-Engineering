@@ -9,7 +9,8 @@ In this project, we are evaluating LLMs in the field of fundamental analysis on 
 # Task Definitions, Schemas and Evaluation Metrics
   ## Task A: Information Synthesis and Corporate Performance Briefing
     For this task, annual reports of 10 major US companies across three distinct industries, together with their 10-K forms, are provided. LLMs are expected to condense these companies’ latest operation results into a one-page analyst brief while capturing key numbers and drivers with source citations. The input will be annual reports (in plain text) as well as their attached 10-K excerpts. The output will be a 250-word briefing structured as Results Snapshot → Key Drivers → Outlook/Risks → Follow-ups, as well as a .json object:
-    ```json
+
+     ```json
     {
      "period": "Q2 FY2025",
      "revenue_yoy_pct": 0.0,
@@ -18,7 +19,7 @@ In this project, we are evaluating LLMs in the field of fundamental analysis on 
      "top_drivers": ["...","..."],
      "top_risks": ["..."],
      "citations": ["press p2 ¶3", "10-K p12 ¶1"]
-    }
+    }```
 
     The output will be evaluated on the following criteria:
     **Schema Validity Rate:** The proportion of parsable .json files, categorized into 4-point scales (>98%--4; 95-98%--3; 90-95%--2; <90%--1)

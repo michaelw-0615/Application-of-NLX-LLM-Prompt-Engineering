@@ -191,7 +191,7 @@ OUTPUT (JSON only; no extra prose):
 - Inconsistent numbers between brief and JSON. Mitigate with an explicit sanity-check step: “confirm JSON equals brief numerics.”
 
 
-## Task B: Information Synthesis
+## Task B: Classification Analysis
 ### B-1: CLEAR Prompt
 
 **Prompt content.** 
@@ -306,3 +306,57 @@ INPUT: Attached as .docx file.
 - Over-generalization from narrow examples. Mitigate by adding one neutral and one negative exemplar later (pilot feedback).
 - Ticker leakage to non-equities (e.g., BTC). Mitigate with explicit “non-equity → null.”
 - Event boundary errors (valuation vs macro_market). Mitigate with a cue list inside the prompt and post-run error sampling to tune wording.
+
+### B-3: Chain-of-Thought Prompt
+
+**Prompt content.**
+
+Plan your steps silently (identify subject → map to label → infer sentiment → extract minimal evidence substring → resolve ticker). DO NOT reveal reasoning. Output JSON ONLY.
+
+LABEL SET AND RULES:
+- event_type ∈ {earnings, M&A_deal, regulatory_policy, investment_capex, product_tech, labor_layoffs, IPO_listing, valuation_milestone, crypto_etf, macro_market, other}
+- sentiment ∈ {pos, neu, neg}
+- ticker: US-listed symbol if clear; otherwise null
+- evidence: exact substring from the headline; minimal but sufficient
+
+INPUT: Attached as .docx file.
+
+OUTPUT (JSON only; one result per input, same order): 
+
+```json
+{
+  "results": [
+    {
+      "event_type": "crypto_etf",
+      "sentiment": "pos",
+      "ticker": null,
+      "evidence": "approves bitcoin ETFs"
+    },
+    {
+      "event_type": "valuation_milestone",
+      "sentiment": "pos",
+      "ticker": "NVDA",
+      "evidence": "world's most valuable company"
+    }
+    // ...
+  ]
+}
+```
+
+NOTES:
+
+- Ensure evidence is a verbatim substring of each headline.
+- No extra keys; strictly match the schema above.
+
+**Design rationale.** The task requires micro-decisions (identify subject → map to label → assign sentiment → extract minimal evidence → resolve ticker). A private checklist reduces flip-flops without polluting outputs, improving schema validity and evidence precision.
+
+**Expected output characteristics.**
+- JSON-in/JSON-out: convenient for pipelines; position-aligned results.
+- Consistent, short evidence strings and conservative ticker resolution.
+- Deterministic behavior when run at low temperature.
+
+**Potential failure modes & mitigations.**
+- Verbose outputs or rationale leakage. Mitigate via “JSON only; no commentary.”
+- Evidence too long or paraphrased. Mitigate with “minimal but sufficient; exact substring.”
+- Sentiment drift. Mitigate by anchoring sentiment to market-relevant framing and enumerating typical positive/negative cues.
+

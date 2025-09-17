@@ -10,7 +10,7 @@ You’re an equity research analyst. You will process a batch of 10-K excerpts f
 1) a ≤250-word analyst brief with four sections (Results Snapshot → Key Drivers → Outlook & Risks → Follow-ups), and
 2) one JSON object matching the schema at the end of this message.
 
-Rules:
+RULES:
 - Use ONLY the provided text. If evidence for a field is missing, write “unavailable in provided 10-K excerpt” in the brief and set that JSON field to null.
 - Normalize units: YoY/QoQ in percentage points (one decimal), operating margin delta in bps (integer), currency in USD millions if mentioned.
 - Every numeric claim in the brief must be backed by a citation present in the JSON `citations` array.
@@ -49,13 +49,13 @@ JSON SCHEMA (for each company)
 ### A-2: Few-Shot Prompt
 **Prompt content.**
 
-[Example 1 Input]
+[EXAMPLE 1 INPUT]
 
 Company: American Express Company (AMEX) | Period: FY2015 | Doc ID: AMEX-10K-2015
 
 https://s26.q4cdn.com/747928648/files/doc_financials/2024/q4/65345cb2-3baf-42fd-ad88-968e29a7264a.pdf
 
-[Example 1 Output]
+[EXAMPLE 1 OUTPUT]
 
 - Results Snapshot. AMEX’s total revenues net of interest expense fell 4% YoY to $32.8bn (doc:AMEX-10K-2015 p.64 table). Operating margin is not presented on a GAAP basis in the filing for this business model; therefore margin delta is unavailable.
 - Key Drivers. Billed-business growth was offset by a lower average discount rate and higher contra-discount rewards(cash rebates) (doc:AMEX-10K-2015 p.65 ¶TOTAL REVENUES NET OF INTEREST EXPENSE).
@@ -79,13 +79,13 @@ https://s26.q4cdn.com/747928648/files/doc_financials/2024/q4/65345cb2-3baf-42fd-
     ```
 
 
-[Example 2 Input]
+[EXAMPLE 2 INPUT]
 
 Company: 3M | Period: FY2024 | Doc ID: MMM-10K-2024
 
 https://www.sec.gov/Archives/edgar/data/66740/000089710104000425/mmm041053s1_10k.htm 
 
-[Example 2 Output]
+[EXAMPLE 2 OUTPUT]
 
 - Results Snapshot. Net sales −0.1% YoY to $24.6bn (GAAP); operating margin rebounded to 19.6% from (43.4)% in 2023 (+6,300 bps), reflecting the lapping of prior-year litigation charges and restructuring effects (doc:MMM-10K-2024 Item 7 table).
 - Key Drivers. Spending discipline, sourcing actions, restructuring, higher selling prices, and productivity supported earnings (doc:MMM-10K-2024 Item 7 narrative).
@@ -198,14 +198,15 @@ OUTPUT (JSON only; no extra prose):
 
 You are a finance news tagging assistant for downstream analytics. Return a VALID JSON array only (no prose). Use the label set and rules exactly.
 
-Task
+TASK
+
 For each input headline, produce an object with:
 - event_type ∈ {earnings, M&A_deal, regulatory_policy, investment_capex, product_tech, labor_layoffs, IPO_listing, valuation_milestone, crypto_etf, macro_market, other}
 - sentiment ∈ {pos, neu, neg}  // market-relevant tone implied by the headline
 - ticker: primary listed symbol if unambiguous (e.g., NVDA, AAPL); else null
 - evidence: exact substring from the headline that justifies event_type (minimal span)
 
-Disambiguation rules
+DISAMBIGUATION RULES
 - If multiple entities appear, pick the primary subject of the action.
 - “most valuable”, “$3 trillion market cap”, “record high” → valuation_milestone.
 - Government/SEC/antitrust/approval/ban/filing → regulatory_policy (crypto ETFs use crypto_etf).
@@ -214,8 +215,9 @@ Disambiguation rules
 - “cuts/layoffs/hiring freeze” → labor_layoffs.
 - If ticker can’t be confidently resolved or isn’t an equity (e.g., Bitcoin), use null.
 
-Output format (strict)
-Return a JSON array with one object per headline, same order as input. Example shape:
+OUTPUT FORMAT
+
+Strictly return a JSON array with one object per headline, same order as input. Example shape:
 
 ```json
 [

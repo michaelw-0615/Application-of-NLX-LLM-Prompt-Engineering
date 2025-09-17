@@ -246,3 +246,63 @@ INPUT HEADLINES: One per line, attached as .docx file.
 - Ticker over-resolution (guessing). Mitigate by “if ambiguous, return null” and prefer primary subject.
 - Label confusion (e.g., regulatory vs crypto_etf; product_tech vs investment_capex). Mitigate with rule bullets and high-signal cue words (“approve/ban/filing” vs “build/invest/plant”).
 - Format errors. Mitigate with JSON-array schema and “no prose” rule.
+
+### B-2: Few-Shot Prompt
+**Prompt content.**
+
+You are a precise finance headline classifier. Output JSON ONLY (no prose). Follow the label set and rules exactly. Use minimal-span evidence (exact substring from the headline).
+
+LABEL SET
+- event_type ∈ {earnings, M&A_deal, regulatory_policy, investment_capex, product_tech, labor_layoffs, IPO_listing, valuation_milestone, crypto_etf, macro_market, other}
+- sentiment ∈ {pos, neu, neg}
+- ticker: primary listed symbol if unambiguous; else null
+- evidence: exact substring from the headline supporting event_type
+
+[EXAMPLE 1 INPUT]
+
+"US SEC approves bitcoin ETFs in watershed for crypto industry"
+
+[EXAMPLE 1 OUTPUT]
+
+```json
+{
+  "event_type": "crypto_etf",
+  "sentiment": "pos",
+  "ticker": null,
+  "evidence": "approves bitcoin ETFs"
+}
+```
+
+[EXAMPLE 2 INPUT]
+
+"Nvidia eclipses Microsoft as world's most valuable company"
+
+[EXAMPLE 2 OUTPUT]
+
+```json
+{
+  "event_type": "valuation_milestone",
+  "sentiment": "pos",
+  "ticker": "NVDA",
+  "evidence": "world's most valuable company"
+}
+```
+
+Now classify the batch input below. Return a JSON array of objects (same order). No extra fields, no commentary.
+
+INPUT: Attached as .docx file.
+
+
+**Design rationale.** Two examples from the train dataset (e.g., “SEC approves bitcoin ETFs” → crypto_etf, “Nvidia … most valuable” → valuation_milestone) anchor label semantics and evidence granularity (minimal span), reducing ambiguity and boosting F1 scores.
+
+**Expected output characteristics.**
+
+- JSON array; each object mirrors the examples’ compact style.
+- Consistent evidence spans (short, decisive trigger phrases).
+- Stable sentiment mapping from headline framing.
+
+**Potential failure modes & mitigations.**
+
+- Over-generalization from narrow examples. Mitigate by adding one neutral and one negative exemplar later (pilot feedback).
+- Ticker leakage to non-equities (e.g., BTC). Mitigate with explicit “non-equity → null.”
+- Event boundary errors (valuation vs macro_market). Mitigate with a cue list inside the prompt and post-run error sampling to tune wording.

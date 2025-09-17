@@ -36,25 +36,37 @@ JSON SCHEMA (for each company)
 **Expected output characteristics.**
 
 •	One ≤250-word brief with four sections: Results Snapshot → Key Drivers → Outlook & Risks → Follow-ups.
+
 •	One strict JSON object conforming to the shared schema; values normalized (YoY to 1 decimal pp; margin deltas in bps).
+
 •	Citations for every numeric claim, pointing to page/paragraph/table anchors.
 
 **Potential failure modes & mitigations.**
 
 •	Hallucinated facts or missing citations. Mitigate by: “sources only” rule; require citation coverage and invalidate uncited numerics.
+
 •	Schema drift/invalid JSON. Mitigate by explicit “JSON-only” gate and example skeleton; add a final “validate JSON parsability” instruction.
+
 •	Accounting ambiguity (GAAP vs CC/Non-GAAP). Mitigate by defaulting to GAAP unless the text explicitly states otherwise; instruct to disclose basis in the brief.
+
 •	Excess length. Mitigate with explicit ≤250-word cap and section headers.
 
 ### Few-shot Prompt
 **Prompt content.**
 [Example 1 Input]
+
     Company: American Express Company (AMEX) | Period: FY2015 | Doc ID: AMEX-10K-2015
+
     https://s26.q4cdn.com/747928648/files/doc_financials/2024/q4/65345cb2-3baf-42fd-ad88-968e29a7264a.pdf
+
 [Example 1 Output]
+
     Results Snapshot. AMEX’s total revenues net of interest expense fell 4% YoY to $32.8bn (doc:AMEX-10K-2015 p.64 table). Operating margin is not presented on a GAAP basis in the filing for this business model; therefore margin delta is unavailable.
+
     Key Drivers. Billed-business growth was offset by a lower average discount rate and higher contra-discount rewards(cash rebates) (doc:AMEX-10K-2015 p.65 ¶TOTAL REVENUES NET OF INTEREST EXPENSE).
+
     Outlook & Risks. FX exposure from international operations and continued discount-rate pressure are highlighted (doc:AMEX-10K-2015 p.64–65).
+
     Follow-ups. Clarify 2016 margin framework and the sensitivity to discount-rate moves; quantify FX headwinds in basis points.
 
     ```json
@@ -75,12 +87,19 @@ JSON SCHEMA (for each company)
 
 
 [Example 2 Input]
+
     Company: 3M | Period: FY2024 | Doc ID: MMM-10K-2024
+
     https://www.sec.gov/Archives/edgar/data/66740/000089710104000425/mmm041053s1_10k.htm 
+
 [Example 2 Output]
+
     Results Snapshot. Net sales −0.1% YoY to $24.6bn (GAAP); operating margin rebounded to 19.6% from (43.4)% in 2023 (+6,300 bps), reflecting the lapping of prior-year litigation charges and restructuring effects (doc:MMM-10K-2024 Item 7 table).
+
     Key Drivers. Spending discipline, sourcing actions, restructuring, higher selling prices, and productivity supported earnings (doc:MMM-10K-2024 Item 7 narrative).
+
     Outlook & Risks. Ongoing sensitivity to volumes, manufacturing/supply-chain, inflation, and regional demand(China/Europe) is noted (doc:MMM-10K-2024 Item 7 narrative).
+
     Follow-ups. Break out non-recurring items vs. structural margin lift; quantify 2025 mix/pricing assumptions.
 
     ```json
@@ -119,13 +138,19 @@ STRICT OUTPUT: For each block, print the brief (≤250 words) followed by exactl
 **Design rationale.** Two in-distribution examples (e.g., “SEC approves bitcoin ETFs” → crypto_etf, “Nvidia … most valuable” → valuation_milestone) anchor label semantics and evidence granularity (minimal span), reducing ambiguity and boosting early F1.
 
 **Expected output characteristics.**
+
 •	JSON array; each object mirrors the examples’ compact style.
+
 •	Consistent evidence spans (short, decisive trigger phrases).
+
 •	Stable sentiment mapping from headline framing.
 
 **Potential failure modes & mitigations.**
+
 •	Over-generalization from narrow examples. Mitigate by adding one neutral and one negative exemplar later (pilot feedback).
+
 •	Ticker leakage to non-equities (e.g., BTC). Mitigate with explicit “non-equity → null.”
+
 •	Event boundary errors (valuation vs macro_market). Mitigate with a cue list inside the prompt and post-run error sampling to tune wording.
 
 

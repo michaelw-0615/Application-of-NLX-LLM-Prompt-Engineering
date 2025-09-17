@@ -145,29 +145,7 @@ STRICT OUTPUT: For each block, print the brief (≤250 words) followed by exactl
 
 You will silently plan the steps (locate numbers → normalize units → verify evidence → compose brief → validate JSON), but DO NOT reveal your chain-of-thought. Use only the provided text.
 
-INPUT (JSON array of documents):
-
-```json
-{
-  "docs": [
-    {
-      "company": "{COMPANY_1}",
-      "period": "{FISCAL_YEAR_1}",
-      "doc_id": "{DOC_ID_1}",
-      "doc_text": "{DOC_TEXT_1}",
-      "table_text": "{TABLE_TEXT_1}"
-    },
-    {
-      "company": "{COMPANY_2}",
-      "period": "{FISCAL_YEAR_2}",
-      "doc_id": "{DOC_ID_2}",
-      "doc_text": "{DOC_TEXT_2}",
-      "table_text": "{TABLE_TEXT_2}"
-    }
-    // ... repeat for all companies
-  ]
-}
-```
+INPUT: Attached as batch PDF files.
 
 CONSTRAINTS
 - Normalize: YoY in pp (1 decimal), operating-margin delta in bps (integer), currency in USD millions if mentioned.
@@ -199,3 +177,16 @@ OUTPUT (JSON only; no extra prose):
 }
 ```
 
+**Design rationale.** Complex extraction (derive YoY; convert margin deltas to bps; check GAAP basis) benefits from private, step-wise logical reasoning (locate → normalize → verify → compose → validate) while not revealing internal reasoning in the final output.
+
+**Expected output characteristics.**
+
+- Same two-part output as A1: sectioned brief + strict JSON.
+- Higher Numeric Fact Accuracy and lower logic slips due to explicit internal checklists.
+- Strict citation-backed numeric statements.
+
+**Potential failure modes & mitigations.**
+
+- Reasoning leakage (exposing steps). Mitigate by “do not reveal your intermediate reasoning; output only brief + JSON.”
+- Inconsistent numbers between brief and JSON. Mitigate with an explicit sanity-check step: “confirm JSON equals brief numerics.”
+- Null handling confusion. Mitigate by requiring null plus a narrative note when evidence is missing.

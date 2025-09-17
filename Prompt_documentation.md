@@ -3,7 +3,7 @@
 Below are design notes for six prompts (three per task). For each, we summarize: **Design rationale**, **Expected output characteristics**, and **Potential failure modes with mitigations**. This documentation is aimed at creating reproducible benchmarking in Phase 3, or the testing and evaluation phase.
 
 ## Task A: Information Synthesis
-### CLEAR Prompt
+### A-1: CLEAR Prompt
 **Prompt content**. 
 
 You’re an equity research analyst. You will process a batch of 10-K excerpts for your customer and return, for EACH document, exactly:
@@ -46,7 +46,7 @@ JSON SCHEMA (for each company)
 - Accounting ambiguity (GAAP vs CC/Non-GAAP). Mitigate by defaulting to GAAP unless the text explicitly states otherwise; instruct to disclose basis in the brief.
 - Excess length. Mitigate with explicit ≤250-word cap and section headers.
 
-### Few-Shot Prompt
+### A-2: Few-Shot Prompt
 **Prompt content.**
 
 [Example 1 Input]
@@ -139,7 +139,7 @@ STRICT OUTPUT: For each block, print the brief (≤250 words) followed by exactl
 - Ticker leakage to non-equities (e.g., BTC). Mitigate with explicit “non-equity → null.”
 - Event boundary errors (valuation vs macro_market). Mitigate with a cue list inside the prompt and post-run error sampling to tune wording.
 
-### Chain-of-Thought Prompt
+### A-3: Chain-of-Thought Prompt
 
 **Prompt content.** 
 
@@ -189,4 +189,43 @@ OUTPUT (JSON only; no extra prose):
 
 - Reasoning leakage (exposing steps). Mitigate by “do not reveal your intermediate reasoning; output only brief + JSON.”
 - Inconsistent numbers between brief and JSON. Mitigate with an explicit sanity-check step: “confirm JSON equals brief numerics.”
-- Null handling confusion. Mitigate by requiring null plus a narrative note when evidence is missing.
+
+
+## Task B: Information Synthesis
+### B-1: CLEAR Prompt
+
+**Prompt content.** 
+
+You are a finance news tagging assistant for downstream analytics. Return a VALID JSON array only (no prose). Use the label set and rules exactly.
+
+Task
+For each input headline, produce an object with:
+- event_type ∈ {earnings, M&A_deal, regulatory_policy, investment_capex, product_tech, labor_layoffs, IPO_listing, valuation_milestone, crypto_etf, macro_market, other}
+- sentiment ∈ {pos, neu, neg}  // market-relevant tone implied by the headline
+- ticker: primary listed symbol if unambiguous (e.g., NVDA, AAPL); else null
+- evidence: exact substring from the headline that justifies event_type (minimal span)
+
+Disambiguation rules
+- If multiple entities appear, pick the primary subject of the action.
+- “most valuable”, “$3 trillion market cap”, “record high” → valuation_milestone.
+- Government/SEC/antitrust/approval/ban/filing → regulatory_policy (crypto ETFs use crypto_etf).
+- Build/expand/plant/invest/budget/capex/partnership → investment_capex.
+- Chips/devices/models/AI features/software launches → product_tech.
+- “cuts/layoffs/hiring freeze” → labor_layoffs.
+- If ticker can’t be confidently resolved or isn’t an equity (e.g., Bitcoin), use null.
+
+Output format (strict)
+Return a JSON array with one object per headline, same order as input. Example shape:
+
+```json
+[
+    {
+        "event_type":"valuation_milestone",
+        "sentiment":"pos",
+        "ticker":"NVDA",
+        "evidence":"most valuable company"
+    }
+]
+```
+
+INPUT HEADLINES (one per line, attached as .docx file)

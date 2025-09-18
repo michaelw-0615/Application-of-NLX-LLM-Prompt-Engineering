@@ -46,7 +46,7 @@ In this project, we are evaluating LLMs in the field of fundamental analysis on 
     
   The output will be evaluated on the following criteria:
 
-  **Event-Type Macro-F1:** The F1-score for all event-type tags, categorized into 4-point scales (>95%--4; 90-95%--3; 75-90%--2; <75%--1)
+  **Event-Type Macro-F1:** The F1-score for all event-type tags, categorized into 4-point scales (>90%--4; 80-90%--3; 70-80%--2; <70%--1)
 
   **Sentiment Macro-F1:** The F1-score for all sentiment tags, categorized into 4-point scales (>95%--4; 90-95%--3; 75-90%--2; <75%--1)
 

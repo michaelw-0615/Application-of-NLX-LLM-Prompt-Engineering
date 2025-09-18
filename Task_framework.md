@@ -28,7 +28,7 @@ In this project, we are evaluating LLMs in the field of fundamental analysis on 
 
   **Fact Accuracy:** The proportion of exact-matches for revenue_yoy_pct and op_margin_bps_delta indices categorized into 4-point scales (>95%--4; 90-95%--3; 75-90%--2; <75%--1)
 
-  **Citation Coverage:** Percentage of numerical claims with at least one correct citation span, categorized into 4-point scales (>95%--4; 90-95%--3; 80-90%--2; <80%--1)
+  **Citation Coverage:** Percentage of numerical claims with at least one correct citation span, categorized into 4-point scales (>90%--4; 80-90%--3; 70-80%--2; <70%--1)
 
   **Coverage and Overall Readability:** Percentage of briefings including all four narrative sections, categorized into 4-point scales (>95%--4; 90-95%--3; 80-90%--2; <80%--1)
 

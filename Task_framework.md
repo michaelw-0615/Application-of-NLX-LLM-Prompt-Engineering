@@ -50,4 +50,4 @@ In this project, we are evaluating LLMs in the field of fundamental analysis on 
 
   **Sentiment Macro-F1:** The F1-score for all sentiment tags, categorized into 4-point scales (>95%--4; 90-95%--3; 75-90%--2; <75%--1)
 
-  **Evidence Precision:** The precision score for all evidence pieces returned, categorized into 4-point scales (>95%--4; 90-95%--3; 75-90%--2; <75%--1)
+  **Ticker Macro-F1:** The F1-score for all ticker tags, categorized into 4-point scales (>95%--4; 90-95%--3; 75-90%--2; <75%--1)

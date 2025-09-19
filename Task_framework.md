@@ -26,7 +26,7 @@ In this project, we are evaluating LLMs in the field of fundamental analysis on 
 
   **Schema Validity Rate:** The proportion of parsable .json files, categorized into 4-point scales (>98%--4; 95-98%--3; 90-95%--2; <90%--1)
 
-  **Fact Accuracy:** The proportion of exact-matches for revenue_yoy_pct and op_margin_bps_delta indices categorized into 4-point scales (>95%--4; 90-95%--3; 75-90%--2; <75%--1)
+  **Fact Accuracy:** The proportion of exact-matches for revenue_yoy_pct and op_margin_bps_delta indices categorized into 4-point scales (>90%--4; 75-90%--3; 60-75%--2; <60%--1)
 
   **Citation Coverage:** Percentage of numerical claims with at least one correct citation span, categorized into 4-point scales (>90%--4; 80-90%--3; 70-80%--2; <70%--1)
 
